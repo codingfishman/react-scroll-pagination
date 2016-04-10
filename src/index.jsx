@@ -8,6 +8,7 @@
 */
 
 import React, { PropTypes } from 'react'
+const jQuery = require('jquery')
 
 const ReactScrollPagination = React.createClass({
   propTypes: {
@@ -88,7 +89,7 @@ const ReactScrollPagination = React.createClass({
         excludeHeight = propsExcludeHeight
       }
     } else if (this.props.excludeElement && typeof this.props.excludeElement === 'string') {
-      let excludeEle = $(this.props.excludeElement)
+      let excludeEle = jQuery(this.props.excludeElement)
 
       if (excludeEle.size() === 0) {
         console.error('WARN: Failed to get the element with given selectdor "' + this.props.excludeElement +
@@ -102,7 +103,7 @@ const ReactScrollPagination = React.createClass({
     return excludeHeight
   },
   initialOnePageHeight: function () {
-    const documentHeight = $(document).height()
+    const documentHeight = jQuery(document).height()
 
     // 当totalPages第一次有值时，表明List是初次加载，此时计算页面的高度，并将其作为单页的高度
     // 鉴于页面有固定的顶部头，目前需要将其减去
@@ -116,8 +117,8 @@ const ReactScrollPagination = React.createClass({
     // 鉴于页面有固定的顶部头，目前需要将其减去
     this.initialOnePageHeight()
 
-    let windowHeight = $(window).height()
-    let scrollTop = $(window).scrollTop() + windowHeight - this.getExcludeHeight()
+    let windowHeight = jQuery(window).height()
+    let scrollTop = jQuery(window).scrollTop() + windowHeight - this.getExcludeHeight()
 
     if (this.isolate.onePageHeight !== null) {
       let currentPage = Math.ceil(scrollTop / this.isolate.onePageHeight) || 1
@@ -126,10 +127,10 @@ const ReactScrollPagination = React.createClass({
     }
   },
   scrollHanlder: function () {
-    let documentHeight = $(document).height()
+    let documentHeight = jQuery(document).height()
 
-    let windowHeight = $(window).height()
-    let scrollBottom = $(window).scrollTop() + windowHeight
+    let windowHeight = jQuery(window).height()
+    let scrollBottom = jQuery(window).scrollTop() + windowHeight
 
     // 当滚动条距离底部距离小于30像素的时候出发请求操作
     if ((scrollBottom + 30) >= documentHeight) {
@@ -138,14 +139,14 @@ const ReactScrollPagination = React.createClass({
     this.handlePageValue()
   },
   componentWillUnmount: function () {
-    $(window).unbind('scroll', this.scrollHanlder)
+    jQuery(window).unbind('scroll', this.scrollHanlder)
   },
   componentDidMount: function () {
-    $(window).scroll(this.scrollHanlder)
+    jQuery(window).scroll(this.scrollHanlder)
   },
 
   render: function () {
-    let acutalPageContentDivStyle = Object.assign({}, this.props.innerDivStyle || this.pageContentStyle)
+    let acutalPageContentDivStyle = jQuery.extend({}, this.props.innerDivStyle || this.pageContentStyle)
 
     // 即便是传入的innerDiv，也设置opacity，方便调用者实现opacity的transition效果
     if (!this.state.showPageStatus) {

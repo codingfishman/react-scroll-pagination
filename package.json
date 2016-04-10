@@ -1,6 +1,6 @@
 {
   "name": "react-scroll-pagination",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "A component for paginatino with scrolling",
   "main": "dist/index.js",
   "scripts": {
