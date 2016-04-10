@@ -1,0 +1,29 @@
+{
+  "name": "react-scroll-pagination",
+  "version": "0.5.0",
+  "description": "适用用于React的滚动翻页，支持显示当前屏幕所属于的页数",
+  "main": "index.jsx",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codingfishman/react-scroll-pagination.git"
+  },
+  "keywords": [
+    "react",
+    "pagination",
+    "当前页",
+    "翻页状态"
+  ],
+  "author": "codingfishman",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/codingfishman/react-scroll-pagination/issues"
+  },
+  "homepage": "https://github.com/codingfishman/react-scroll-pagination#readme",
+  "dependencies": {
+    "jquery": "^2.0.0",
+    "react": "^0.14.0"
+  }
+}

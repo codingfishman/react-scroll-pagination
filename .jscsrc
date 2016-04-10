@@ -1,0 +1,25 @@
+{
+    "preset": "google",
+    "fileExtensions": [ ".js", "jscs" ],
+
+    "requireParenthesesAroundIIFE": true,
+    "maximumLineLength": 120,
+    "validateLineBreaks": "LF",
+    "validateIndentation": 2,
+    "esnext": true,
+    "requireSemicolons": null,
+    "requirePaddingNewLinesAfterBlocks": true,
+    "requireSpacesInFunctionExpression": {
+      "beforeOpeningRoundBrace": true,
+      "beforeOpeningCurlyBrace": true
+    }
+    "disallowKeywords": ["with"],
+    "disallowSpacesInsideObjectBrackets": null,
+    "disallowImplicitTypeConversion": ["string"],
+
+    "safeContextKeyword": ["_this", "self", "vm"],
+
+    "excludeFiles": [
+        "test/data/**"
+    ]
+}
