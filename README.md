@@ -65,6 +65,7 @@ Specify how long shall the pagination element displays.
 `OPTIONAL`
 
 `DEFAULT: null`
+
 Usage:`excludeElement: '#nav-bar'`
 
 > While the component is based on the **HEIGHT** of the document, it's quite sensible for the precision of height. And there are cases that the list is just part of the page, in most situations we have such as *Navbar* on the pate as well, and we need to deduct it from calculation.
@@ -75,6 +76,7 @@ This props speicfy the *selector* of the element which should be deduct from hei
 `OPTIONAL`
 
 `DEFAULT: 0`
+
 Usage: `excludeHeight: {50}`, or `execludeHeight: '50px'`
 
 Similar to *excludeElement*, only this props specify the height directly. If both *excludeElement* and *excludeHeight* are specified, only the *excludeHeight* will work.
