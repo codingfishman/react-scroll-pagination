@@ -1,7 +1,7 @@
 {
   "name": "react-scroll-pagination",
   "version": "0.1.5",
-  "description": "A component for paginatino with scrolling",
+  "description": "A component for pagination with scrolling",
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
