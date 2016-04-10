@@ -1,6 +1,6 @@
 {
   "name": "react-scroll-pagination",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "A component for pagination with scrolling",
   "main": "dist/index.js",
   "scripts": {
