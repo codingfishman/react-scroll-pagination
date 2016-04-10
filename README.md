@@ -7,6 +7,14 @@ The pagination element will be displayed on the bottom of the window, with a bot
 
 ANY ISSUE YOU FOUND, PLEASE HELP LET ME KNOW :)
 
+## Install
+NPM
+
+```nodejs
+npm install --save react-scroll-pagination
+
+```
+
 ## Basic Usage
 The code below demonstarted the basic use case with the component, we need to specify both `fetchFunc` and `totalPages` at least.
 
