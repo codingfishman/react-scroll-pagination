@@ -17,7 +17,6 @@ NPM
 
 ```nodejs
 npm install --save react-scroll-pagination
-
 ```
 
 ## Basic Usage
