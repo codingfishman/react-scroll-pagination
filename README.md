@@ -8,9 +8,9 @@ The pagination element will be displayed on the bottom of the window, with a bot
 ANY ISSUE YOU FOUND, PLEASE HELP LET ME KNOW :)
 
 ## DEMO
-A simple demo at [jsFiddle](https://jsfiddle.net/nickday/f0tg0wd7/9/)
+A simple demo at [jsFiddle](https://jsfiddle.net/nickday/f0tg0wd7/10/)
 
-<script async src="//jsfiddle.net/nickday/f0tg0wd7/9/embed/js,html,result/"></script>
+<script async src="//jsfiddle.net/nickday/f0tg0wd7/10/embed/js,html,result/"></script>
 
 ## Install
 NPM
