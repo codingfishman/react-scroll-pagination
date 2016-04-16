@@ -89,6 +89,14 @@ Usage: `excludeHeight: {50}`, or `execludeHeight: '50px'`
 
 Similar to *excludeElement*, only this props specify the height directly. If both *excludeElement* and *excludeHeight* are specified, only the *excludeHeight* will work.
 
+
+### triggerAt
+`OPTIONAL`
+
+DEFAULT: 15(px)
+
+Specify at which a distance when the scroll bar is close to the bottom shall the `fetchFunc` be called. It's usefull when we want to load the next page smoothly so the user can scroll down without a halt.
+
 ### outterDivStyle
 `OPTIONAL`
 
