@@ -37,7 +37,7 @@ const ReactScrollPagination = React.createClass({
     triggerAt: null,
     showTime: null,
     defaultShowTime: 2000,
-    defaultTrigger: 15,
+    defaultTrigger: 30,
     defaultExcludeHeight: 0
   },
   pageDivStle: {
@@ -125,7 +125,7 @@ const ReactScrollPagination = React.createClass({
       if (isNaN(triggerAt)) {
         triggerAt = this.isolate.defaultTrigger
         console.error('WARN: Failed to convert the props "triggerAt" to number with value: "' +
-          this.props.triggerAt + '". Will take 15px by default.')
+          this.props.triggerAt + '". Will take 30px by default.')
       }
     }
 
