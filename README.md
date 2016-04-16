@@ -153,6 +153,7 @@ render: function () {
       paginationShowTime=3000
       excludeElement='#nav-bar'
       excludeHeight=50
+      triggerAt=300
       outterDivStyle={}
       innerDivStyle={}
     />
