@@ -25,7 +25,7 @@ const ReactScrollPagination = React.createClass({
     ]),
     outterDivStyle: PropTypes.object, // Style of the outter Div element
     innerDivStyle: PropTypes.object, // Style of the inner Div element
-    triggerDistance: PropTypes.oneOfType([
+    triggerAt: PropTypes.oneOfType([
       PropTypes.number, // The distance to trigger the fetchfunc
       PropTypes.string
     ]),
@@ -34,7 +34,7 @@ const ReactScrollPagination = React.createClass({
     onePageHeight: null,
     timeoutFunc: null,
     excludeHeight: null,
-    triggerDistance: null,
+    triggerAt: null,
     showTime: null,
     defaultShowTime: 2000,
     defaultTrigger: 15,
@@ -85,8 +85,8 @@ const ReactScrollPagination = React.createClass({
       showTime = parseInt(this.props.paginationShowTime)
       if (isNaN(showTime)) {
         showTime = this.isolate.defaultShowTime
-        console.warn('Failed to convert props paginationShowTime to number with value :"' +
-          this.props.paginationShowTime + '"')
+        console.error('WARN: Failed to convert props "paginationShowTime" to Number with value: "' +
+          this.props.paginationShowTime + '". Will take 2000 by default.')
       }
     }
     return showTime
@@ -98,7 +98,7 @@ const ReactScrollPagination = React.createClass({
     if (this.props.excludeHeight) {
       let propsExcludeHeight = parseInt(this.props.excludeHeight)
       if (isNaN(propsExcludeHeight)) {
-        console.error('WARN: Failed to convert the props excludeHeight "' + this.props.excludeHeight +
+        console.error('WARN: Failed to convert the props "excludeHeight" with value: "' + this.props.excludeHeight +
           '" to Number, please verify. Will take "0" by default.')
       } else {
         excludeHeight = propsExcludeHeight
@@ -117,19 +117,19 @@ const ReactScrollPagination = React.createClass({
 
     return excludeHeight
   },
-  getTriggerDistance: function () {
-    let triggerDistance = this.isolate.defaultTrigger
+  getTriggerAt: function () {
+    let triggerAt = this.isolate.defaultTrigger
 
-    if (this.props.triggerDistance) {
-      triggerDistance= parseInt(this.props.triggerDistance)
-      if (isNaN(triggerDistance)) {
-        triggerDistance = this.isolate.defaultTrigger
-        console.warn(' Failed to convert the props triggerDistance to number with value :"' +
-          this.props.triggerDistance + '"')
+    if (this.props.triggerAt) {
+      triggerAt= parseInt(this.props.triggerAt)
+      if (isNaN(triggerAt)) {
+        triggerAt = this.isolate.defaultTrigger
+        console.error('WARN: Failed to convert the props "triggerAt" to number with value: "' +
+          this.props.triggerAt + '". Will take 15px by default.')
       }
     }
 
-    return triggerDistance
+    return triggerAt
   },
   getOnePageHeight: function () {
     const documentHeight = jQuery(document).height()
@@ -161,14 +161,14 @@ const ReactScrollPagination = React.createClass({
     let scrollBottom = jQuery(window).scrollTop() + windowHeight
 
     // 当滚动条距离底部距离小于30像素的时候出发请求操作
-    if ((scrollBottom + this.isolate.triggerDistance) >= documentHeight) {
+    if ((scrollBottom + this.isolate.triggerAt) >= documentHeight) {
       this.props.fetchFunc()
     }
     this.handlePageValue()
   },
   validateAndGetPropValues: function () {
     // validate the passed props and set them to isolate value
-    this.isolate.triggerDistance = this.getTriggerDistance()
+    this.isolate.triggerAt = this.getTriggerAt()
     this.isolate.excludeHeight = this.getExcludeHeight()
     this.isolate.showTime = this.getShowTime()
   },
