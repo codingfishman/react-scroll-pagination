@@ -25,19 +25,25 @@ var ReactScrollPagination = _react2.default.createClass({
   propTypes: {
     fetchFunc: _react.PropTypes.func.isRequired,
     totalPages: _react.PropTypes.number.isRequired,
-    paginationShowTime: _react.PropTypes.oneOfType([_react.PropTypes.number, // 控制分页详情div的显示时间，单位为毫秒数
+    paginationShowTime: _react.PropTypes.oneOfType([_react.PropTypes.number, // How long shall the pagination div shows
     _react.PropTypes.string]),
-    excludeElement: _react.PropTypes.string, // 需要减去高度的元素，当要减去的高度是不固定的，可传入元素选择器，插件会自己计算其高度
-    excludeHeight: _react.PropTypes.oneOfType([_react.PropTypes.number, // 需要减去的高度，将会从单页高度 onePageHeight 中减去，优先级高于 excludeElement
+    excludeElement: _react.PropTypes.string, // The element selector which should be excluded from calculation
+    excludeHeight: _react.PropTypes.oneOfType([_react.PropTypes.number, // the height value which should be excluded from calculation
     _react.PropTypes.string]),
-    outterDivStyle: _react.PropTypes.object, // 控制最外层Div的style
-    innerDivStyle: _react.PropTypes.object // 内存Div的style
+    outterDivStyle: _react.PropTypes.object, // Style of the outter Div element
+    innerDivStyle: _react.PropTypes.object, // Style of the inner Div element
+    triggerDistance: _react.PropTypes.oneOfType([_react.PropTypes.number, // The distance to trigger the fetchfunc
+    _react.PropTypes.string])
   },
   isolate: {
     onePageHeight: null,
     timeoutFunc: null,
     excludeHeight: null,
-    defaultShowTime: 2000
+    triggerDistance: null,
+    showTime: null,
+    defaultShowTime: 2000,
+    defaultTrigger: 15,
+    defaultExcludeHeight: 0
   },
   pageDivStle: {
     position: 'fixed',
@@ -75,18 +81,25 @@ var ReactScrollPagination = _react2.default.createClass({
       clearTimeout(this.isolate.timeoutFunc);
     }
     this.setState({ showPageStatus: true });
-    var showTime = this.props.paginationShowTime ? parseInt(this.props.paginationShowTime) : this.isolate.defaultShowTime;
 
     this.isolate.timeoutFunc = setTimeout(function () {
       _this.setState({ showPageStatus: false });
-    }, showTime);
+    }, this.isolate.showTime);
+  },
+  getShowTime: function getShowTime() {
+    var showTime = this.isolate.defaultShowTime;
+    if (this.props.paginationShowTime) {
+      showTime = parseInt(this.props.paginationShowTime);
+      if (isNaN(showTime)) {
+        showTime = this.isolate.defaultShowTime;
+        console.warn('Failed to convert props paginationShowTime to number with value :"' + this.props.paginationShowTime + '"');
+      }
+    }
+    return showTime;
   },
   getExcludeHeight: function getExcludeHeight() {
-    if (this.isolate.excludeHeight !== null) {
-      return this.isolate.excludeHeight;
-    }
     // 获取需要减去的高度
-    var excludeHeight = 0;
+    var excludeHeight = this.isolate.defaultExcludeHeight;
 
     if (this.props.excludeHeight) {
       var propsExcludeHeight = parseInt(this.props.excludeHeight);
@@ -108,23 +121,35 @@ var ReactScrollPagination = _react2.default.createClass({
 
     return excludeHeight;
   },
-  initialOnePageHeight: function initialOnePageHeight() {
+  getTriggerDistance: function getTriggerDistance() {
+    var triggerDistance = this.isolate.defaultTrigger;
+
+    if (this.props.triggerDistance) {
+      triggerDistance = parseInt(this.props.triggerDistance);
+      if (isNaN(triggerDistance)) {
+        triggerDistance = this.isolate.defaultTrigger;
+        console.warn(' Failed to convert the props triggerDistance to number with value :"' + this.props.triggerDistance + '"');
+      }
+    }
+
+    return triggerDistance;
+  },
+  getOnePageHeight: function getOnePageHeight() {
     var documentHeight = jQuery(document).height();
 
     // 当totalPages第一次有值时，表明List是初次加载，此时计算页面的高度，并将其作为单页的高度
     // 鉴于页面有固定的顶部头，目前需要将其减去
     if (typeof this.props.totalPages === 'number' && this.props.totalPages > 0 && this.isolate.onePageHeight === null) {
-      var excludeHeight = this.getExcludeHeight();
-      this.isolate.onePageHeight = documentHeight - excludeHeight;
+      this.isolate.onePageHeight = documentHeight - this.isolate.excludeHeight;
     }
   },
   handlePageValue: function handlePageValue() {
     // 当totalPages第一次有值时，表明List是初次加载，此时计算页面的高度，并将其作为单页的高度
     // 鉴于页面有固定的顶部头，目前需要将其减去
-    this.initialOnePageHeight();
+    this.getOnePageHeight();
 
     var windowHeight = jQuery(window).height();
-    var scrollTop = jQuery(window).scrollTop() + windowHeight - this.getExcludeHeight();
+    var scrollTop = jQuery(window).scrollTop() + windowHeight - this.isolate.excludeHeight;
 
     if (this.isolate.onePageHeight !== null) {
       var currentPage = Math.ceil(scrollTop / this.isolate.onePageHeight) || 1;
@@ -139,15 +164,22 @@ var ReactScrollPagination = _react2.default.createClass({
     var scrollBottom = jQuery(window).scrollTop() + windowHeight;
 
     // 当滚动条距离底部距离小于30像素的时候出发请求操作
-    if (scrollBottom + 30 >= documentHeight) {
+    if (scrollBottom + this.isolate.triggerDistance >= documentHeight) {
       this.props.fetchFunc();
     }
     this.handlePageValue();
+  },
+  validateAndGetPropValues: function validateAndGetPropValues() {
+    // validate the passed props and set them to isolate value
+    this.isolate.triggerDistance = this.getTriggerDistance();
+    this.isolate.excludeHeight = this.getExcludeHeight();
+    this.isolate.showTime = this.getShowTime();
   },
   componentWillUnmount: function componentWillUnmount() {
     jQuery(window).unbind('scroll', this.scrollHanlder);
   },
   componentDidMount: function componentDidMount() {
+    this.validateAndGetPropValues();
     jQuery(window).scroll(this.scrollHanlder);
   },
 
