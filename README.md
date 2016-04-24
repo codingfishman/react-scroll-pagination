@@ -66,8 +66,9 @@ function fetchFunc () {
 
 ### totalPages
 `OPTIONAL`
+> If we just want to fetch the next page data without displaying the page number, we can ignore this prop and below
 
-We have to tell the component how many pages we totally have when we want to display the pages, meanwhile, if we just want to fetch the next page, just ignore this prop
+We have to tell the component how many pages we totally have when we want to display the pages, so it can calculate the page position.
 
 ### paginationShowTime
 `OPTIONAL`
