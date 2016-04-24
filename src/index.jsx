@@ -13,7 +13,7 @@ const jQuery = require('jquery')
 const ReactScrollPagination = React.createClass({
   propTypes: {
     fetchFunc: PropTypes.func.isRequired,
-    totalPages: PropTypes.number.isRequired,
+    totalPages: PropTypes.number,
     paginationShowTime: PropTypes.oneOfType([
       PropTypes.number, // How long shall the pagination div shows
       PropTypes.string
@@ -32,7 +32,7 @@ const ReactScrollPagination = React.createClass({
   },
   isolate: {
     onePageHeight: null,
-    timeoutFunc: null,
+    timeoutFuncHandler: null,
     excludeHeight: null,
     triggerAt: null,
     showTime: null,
@@ -70,12 +70,12 @@ const ReactScrollPagination = React.createClass({
     }
   },
   showPageDiv: function () {
-    if (this.isolate.timeoutFunc) {
-      clearTimeout(this.isolate.timeoutFunc)
+    if (this.isolate.timeoutFuncHandler) {
+      clearTimeout(this.isolate.timeoutFuncHandler)
     }
     this.setState({showPageStatus: true})
 
-    this.isolate.timeoutFunc = setTimeout(() => {
+    this.isolate.timeoutFuncHandler = setTimeout(() => {
       this.setState({showPageStatus: false})
     }, this.isolate.showTime)
   },
@@ -85,8 +85,8 @@ const ReactScrollPagination = React.createClass({
       showTime = parseInt(this.props.paginationShowTime)
       if (isNaN(showTime)) {
         showTime = this.isolate.defaultShowTime
-        console.error('WARN: Failed to convert props "paginationShowTime" to Number with value: "' +
-          this.props.paginationShowTime + '". Will take 2000 by default.')
+        console.error('WARNING: Failed to convert props "paginationShowTime" to Number with value: "' +
+          this.props.paginationShowTime + '". Will take ' + this.isolate.defaultShowTime + ' by default.')
       }
     }
     return showTime
@@ -107,8 +107,8 @@ const ReactScrollPagination = React.createClass({
       let excludeEle = jQuery(this.props.excludeElement)
 
       if (excludeEle.size() === 0) {
-        console.error('WARN: Failed to get the element with given selectdor "' + this.props.excludeElement +
-          '", please veirify. Will take "0" by default.')
+        console.error('WARNING: Failed to get the element with given selectdor "' + this.props.excludeElement +
+          '", please veirify. Will take "' + this.isolate.defaultExcludeHeight + '" by default.')
       } else {
         excludeHeight = excludeEle.height()
       }
@@ -124,7 +124,7 @@ const ReactScrollPagination = React.createClass({
       triggerAt= parseInt(this.props.triggerAt)
       if (isNaN(triggerAt)) {
         triggerAt = this.isolate.defaultTrigger
-        console.error('WARN: Failed to convert the props "triggerAt" to number with value: "' +
+        console.error('WARNING: Failed to convert the props "triggerAt" to number with value: "' +
           this.props.triggerAt + '". Will take 30px by default.')
       }
     }
@@ -154,7 +154,7 @@ const ReactScrollPagination = React.createClass({
       this.showPageDiv()
     }
   },
-  scrollHanlder: function () {
+  scrollHandler: function () {
     let documentHeight = jQuery(document).height()
 
     let windowHeight = jQuery(window).height()
@@ -173,14 +173,20 @@ const ReactScrollPagination = React.createClass({
     this.isolate.showTime = this.getShowTime()
   },
   componentWillUnmount: function () {
-    jQuery(window).unbind('scroll', this.scrollHanlder)
+    jQuery(window).unbind('scroll', this.scrollHandler)
   },
   componentDidMount: function () {
     this.validateAndGetPropValues()
-    jQuery(window).scroll(this.scrollHanlder)
+    jQuery(window).scroll(this.scrollHandler)
   },
 
   render: function () {
+
+    // if no totalPages presented, will only do the fetchings
+    if (typeof this.props.totalPages === 'undefined') {
+      return (null)
+    }
+
     let acutalPageContentDivStyle = jQuery.extend({}, this.props.innerDivStyle || this.pageContentStyle)
 
     // 即便是传入的innerDiv，也设置opacity，方便调用者实现opacity的transition效果
@@ -191,7 +197,7 @@ const ReactScrollPagination = React.createClass({
     // let actualDiv = this.state.showPageStatus ? withPageDiv : null
     return (
       <div style={this.props.outterDivStyle || this.pageDivStle} >
-        <div style={acutalPageContentDivStyle} >
+        <div style={acutalPageContentDivStyle} className='react-scroll-pagination-inner-div'>
           <span >
             {this.state.currentPage}
           </span>

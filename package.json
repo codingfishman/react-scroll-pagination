@@ -4,7 +4,7 @@
   "description": "A component for pagination with scrolling",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --no-watchman"
   },
   "repository": {
     "type": "git",
@@ -28,7 +28,24 @@
     "jquery": "^1.0.0"
   },
   "devDependencies": {
+    "babel-eslint": "^6.0.3",
+    "babel-jest": "^9.0.0",
     "babel-preset-react": "^6.5.0",
-    "gulp-babel": "^6.1.2"
+    "eslint": "^2.8.0",
+    "eslint-plugin-flow-vars": "^0.3.0",
+    "gulp-babel": "^6.1.2",
+    "jest-cli": "*",
+    "jscs": "^3.0.3",
+    "react-addons-test-utils": "~0.14.0",
+    "react-dom": "^0.14.0"
+  },
+  "jest": {
+    "unmockedModulePathPatterns": [
+      "<rootDir>/node_modules/react",
+      "<rootDir>/node_modules/react-dom",
+      "<rootDir>/node_modules/react-addons-test-utils",
+      "<rootDir>/node_modules/jquery"
+    ],
+    "collectCoverage": true
   }
 }

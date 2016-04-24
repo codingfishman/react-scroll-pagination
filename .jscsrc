@@ -1,6 +1,6 @@
 {
     "preset": "google",
-    "fileExtensions": [ ".js", "jscs" ],
+    "fileExtensions": [ ".js", "jscs", ".jsx" ],
 
     "requireParenthesesAroundIIFE": true,
     "maximumLineLength": 120,

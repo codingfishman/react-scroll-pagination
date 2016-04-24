@@ -11,17 +11,8 @@
     "browser" : true
   },
   "globals" : {
-    "Action"       : false,
-    "__DEV__"      : false,
-    "__PROD__"     : false,
-    "__DEBUG__"    : false,
-    "__DEBUG_NEW_WINDOW__" : false,
-    "__BASENAME__" : false,
-    "UE" : false,
     "jQuery": false,
-    "$": false,
-    "TDAPP": false,
-    "wx": false
+    "$": false
   },
   "rules": {
     "semi" : [2, "never"],
