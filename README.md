@@ -1,4 +1,6 @@
 # react-scroll-pagination
+![Travis](https://travis-ci.org/codingfishman/react-scroll-pagination.svg?branch=master)
+
 A React component to help the page with scrolling pagination. It will execute the fetching function when the scrollbal is close to the bottom in less than 30 pixers.
 
 It will also show the paging status when scrolling, when it's **scrolling down and scrolling up**, include the *current page* and *total pages*, this is done by calculating the `document height` and `one page height`.
@@ -6,6 +8,7 @@ It will also show the paging status when scrolling, when it's **scrolling down a
 The pagination element will be displayed on the bottom of the window, with a bottom of `15px` in `fixed` position. I should set up a demo page, I know ;(.
 
 ANY ISSUE YOU FOUND, PLEASE HELP LET ME KNOW :)
+
 
 ## DEMO
 A simple demo at [jsFiddle](https://jsfiddle.net/nickday/f0tg0wd7/10/)
