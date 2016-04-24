@@ -62,9 +62,9 @@ function fetchFunc () {
 ```
 
 ### totalPages
-`REQUIRED`
+`OPTIONAL`
 
-We have to tell the component how many pages we totally have, it's hard to know :)
+We have to tell the component how many pages we totally have when we want to display the pages, meanwhile, if we just want to fetch the next page, just ignore this prop
 
 ### paginationShowTime
 `OPTIONAL`

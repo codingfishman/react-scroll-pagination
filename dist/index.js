@@ -24,7 +24,7 @@ var ReactScrollPagination = _react2.default.createClass({
 
   propTypes: {
     fetchFunc: _react.PropTypes.func.isRequired,
-    totalPages: _react.PropTypes.number.isRequired,
+    totalPages: _react.PropTypes.number,
     paginationShowTime: _react.PropTypes.oneOfType([_react.PropTypes.number, // How long shall the pagination div shows
     _react.PropTypes.string]),
     excludeElement: _react.PropTypes.string, // The element selector which should be excluded from calculation
@@ -37,7 +37,7 @@ var ReactScrollPagination = _react2.default.createClass({
   },
   isolate: {
     onePageHeight: null,
-    timeoutFunc: null,
+    timeoutFuncHandler: null,
     excludeHeight: null,
     triggerAt: null,
     showTime: null,
@@ -77,12 +77,12 @@ var ReactScrollPagination = _react2.default.createClass({
   showPageDiv: function showPageDiv() {
     var _this = this;
 
-    if (this.isolate.timeoutFunc) {
-      clearTimeout(this.isolate.timeoutFunc);
+    if (this.isolate.timeoutFuncHandler) {
+      clearTimeout(this.isolate.timeoutFuncHandler);
     }
     this.setState({ showPageStatus: true });
 
-    this.isolate.timeoutFunc = setTimeout(function () {
+    this.isolate.timeoutFuncHandler = setTimeout(function () {
       _this.setState({ showPageStatus: false });
     }, this.isolate.showTime);
   },
@@ -92,7 +92,7 @@ var ReactScrollPagination = _react2.default.createClass({
       showTime = parseInt(this.props.paginationShowTime);
       if (isNaN(showTime)) {
         showTime = this.isolate.defaultShowTime;
-        console.error('WARN: Failed to convert props "paginationShowTime" to Number with value: "' + this.props.paginationShowTime + '". Will take 2000 by default.');
+        console.error('WARNING: Failed to convert props "paginationShowTime" to Number with value: "' + this.props.paginationShowTime + '". Will take ' + this.isolate.defaultShowTime + ' by default.');
       }
     }
     return showTime;
@@ -112,7 +112,7 @@ var ReactScrollPagination = _react2.default.createClass({
       var excludeEle = jQuery(this.props.excludeElement);
 
       if (excludeEle.size() === 0) {
-        console.error('WARN: Failed to get the element with given selectdor "' + this.props.excludeElement + '", please veirify. Will take "0" by default.');
+        console.error('WARNING: Failed to get the element with given selectdor "' + this.props.excludeElement + '", please veirify. Will take "' + this.isolate.defaultExcludeHeight + '" by default.');
       } else {
         excludeHeight = excludeEle.height();
       }
@@ -128,7 +128,7 @@ var ReactScrollPagination = _react2.default.createClass({
       triggerAt = parseInt(this.props.triggerAt);
       if (isNaN(triggerAt)) {
         triggerAt = this.isolate.defaultTrigger;
-        console.error('WARN: Failed to convert the props "triggerAt" to number with value: "' + this.props.triggerAt + '". Will take 30px by default.');
+        console.error('WARNING: Failed to convert the props "triggerAt" to number with value: "' + this.props.triggerAt + '". Will take 30px by default.');
       }
     }
 
@@ -157,7 +157,7 @@ var ReactScrollPagination = _react2.default.createClass({
       this.showPageDiv();
     }
   },
-  scrollHanlder: function scrollHanlder() {
+  scrollHandler: function scrollHandler() {
     var documentHeight = jQuery(document).height();
 
     var windowHeight = jQuery(window).height();
@@ -176,14 +176,20 @@ var ReactScrollPagination = _react2.default.createClass({
     this.isolate.showTime = this.getShowTime();
   },
   componentWillUnmount: function componentWillUnmount() {
-    jQuery(window).unbind('scroll', this.scrollHanlder);
+    jQuery(window).unbind('scroll', this.scrollHandler);
   },
   componentDidMount: function componentDidMount() {
     this.validateAndGetPropValues();
-    jQuery(window).scroll(this.scrollHanlder);
+    jQuery(window).scroll(this.scrollHandler);
   },
 
   render: function render() {
+
+    // if no totalPages presented, will only do the fetchings
+    if (typeof this.props.totalPages === 'undefined') {
+      return null;
+    }
+
     var acutalPageContentDivStyle = jQuery.extend({}, this.props.innerDivStyle || this.pageContentStyle);
 
     // 即便是传入的innerDiv，也设置opacity，方便调用者实现opacity的transition效果
@@ -197,7 +203,7 @@ var ReactScrollPagination = _react2.default.createClass({
       { style: this.props.outterDivStyle || this.pageDivStle },
       _react2.default.createElement(
         'div',
-        { style: acutalPageContentDivStyle },
+        { style: acutalPageContentDivStyle, className: 'react-scroll-pagination-inner-div' },
         _react2.default.createElement(
           'span',
           null,
