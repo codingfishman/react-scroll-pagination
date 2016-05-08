@@ -12,6 +12,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var jQuery = require('jquery'); /**
                                 * 在页面滚动的时候，监听滚动事件，在快要到达底部指定距离的时候，执行相应函数
+                                * 如果传入 totalPages, 则会在鼠标滚动时
                                 *
                                 * <ReactScrollPagination
                                     fetchFunc = {targetFuc}
@@ -74,7 +75,8 @@ var ReactScrollPagination = _react2.default.createClass({
       showPageStatus: false
     };
   },
-  showPageDiv: function showPageDiv() {
+
+  showPagePositionDiv: function showPagePositionDiv() {
     var _this = this;
 
     if (this.isolate.timeoutFuncHandler) {
@@ -97,6 +99,7 @@ var ReactScrollPagination = _react2.default.createClass({
     }
     return showTime;
   },
+
   getExcludeHeight: function getExcludeHeight() {
     // 获取需要减去的高度
     var excludeHeight = this.isolate.defaultExcludeHeight;
@@ -104,7 +107,7 @@ var ReactScrollPagination = _react2.default.createClass({
     if (this.props.excludeHeight) {
       var propsExcludeHeight = parseInt(this.props.excludeHeight);
       if (isNaN(propsExcludeHeight)) {
-        console.error('WARN: Failed to convert the props "excludeHeight" with value: "' + this.props.excludeHeight + '" to Number, please verify. Will take "0" by default.');
+        console.error('WARNING: Failed to convert the props "excludeHeight" with value: "' + this.props.excludeHeight + '" to Number, please verify. Will take "' + this.isolate.defaultExcludeHeight + '" by default.');
       } else {
         excludeHeight = propsExcludeHeight;
       }
@@ -112,7 +115,7 @@ var ReactScrollPagination = _react2.default.createClass({
       var excludeEle = jQuery(this.props.excludeElement);
 
       if (excludeEle.size() === 0) {
-        console.error('WARNING: Failed to get the element with given selectdor "' + this.props.excludeElement + '", please veirify. Will take "' + this.isolate.defaultExcludeHeight + '" by default.');
+        console.error('WARNING: Failed to get the element with given selector "' + this.props.excludeElement + '", please veirify. Will take "' + this.isolate.defaultExcludeHeight + '" by default.');
       } else {
         excludeHeight = excludeEle.height();
       }
@@ -121,31 +124,35 @@ var ReactScrollPagination = _react2.default.createClass({
 
     return excludeHeight;
   },
+
   getTriggerAt: function getTriggerAt() {
     var triggerAt = this.isolate.defaultTrigger;
 
     if (this.props.triggerAt) {
       triggerAt = parseInt(this.props.triggerAt);
+
       if (isNaN(triggerAt)) {
         triggerAt = this.isolate.defaultTrigger;
+
         console.error('WARNING: Failed to convert the props "triggerAt" to number with value: "' + this.props.triggerAt + '". Will take 30px by default.');
       }
     }
 
     return triggerAt;
   },
+
   getOnePageHeight: function getOnePageHeight() {
     var documentHeight = jQuery(document).height();
 
-    // 当totalPages第一次有值时，表明List是初次加载，此时计算页面的高度，并将其作为单页的高度
-    // 鉴于页面有固定的顶部头，目前需要将其减去
+    /*
+    * 当totalPages第一次有值时，表明List是初次加载，此时计算页面的高度，并将其作为单页的高度
+    * 如果页面有固定的顶部头，通过 excludeHeight 将其减去
+    */
     if (typeof this.props.totalPages === 'number' && this.props.totalPages > 0 && this.isolate.onePageHeight === null) {
       this.isolate.onePageHeight = documentHeight - this.isolate.excludeHeight;
     }
   },
-  handlePageValue: function handlePageValue() {
-    // 当totalPages第一次有值时，表明List是初次加载，此时计算页面的高度，并将其作为单页的高度
-    // 鉴于页面有固定的顶部头，目前需要将其减去
+  handlePagePosition: function handlePagePosition() {
     this.getOnePageHeight();
 
     var windowHeight = jQuery(window).height();
@@ -154,37 +161,41 @@ var ReactScrollPagination = _react2.default.createClass({
     if (this.isolate.onePageHeight !== null) {
       var currentPage = Math.ceil(scrollTop / this.isolate.onePageHeight) || 1;
       this.setState({ currentPage: currentPage });
-      this.showPageDiv();
+      this.showPagePositionDiv();
     }
   },
+
   scrollHandler: function scrollHandler() {
     var documentHeight = jQuery(document).height();
 
     var windowHeight = jQuery(window).height();
     var scrollBottom = jQuery(window).scrollTop() + windowHeight;
+    var triggerBottom = scrollBottom + this.isolate.triggerAt;
 
     // 当滚动条距离底部距离小于30像素的时候出发请求操作
-    if (scrollBottom + this.isolate.triggerAt >= documentHeight) {
+    if (triggerBottom >= documentHeight) {
       this.props.fetchFunc();
     }
-    this.handlePageValue();
+
+    this.handlePagePosition();
   },
-  validateAndGetPropValues: function validateAndGetPropValues() {
-    // validate the passed props and set them to isolate value
+
+  validateAndSetPropValues: function validateAndSetPropValues() {
     this.isolate.triggerAt = this.getTriggerAt();
     this.isolate.excludeHeight = this.getExcludeHeight();
     this.isolate.showTime = this.getShowTime();
   },
+
   componentWillUnmount: function componentWillUnmount() {
     jQuery(window).unbind('scroll', this.scrollHandler);
   },
+
   componentDidMount: function componentDidMount() {
-    this.validateAndGetPropValues();
+    this.validateAndSetPropValues();
     jQuery(window).scroll(this.scrollHandler);
   },
 
   render: function render() {
-
     // if no totalPages presented, will only do the fetchings
     if (typeof this.props.totalPages === 'undefined') {
       return null;
@@ -192,12 +203,11 @@ var ReactScrollPagination = _react2.default.createClass({
 
     var acutalPageContentDivStyle = jQuery.extend({}, this.props.innerDivStyle || this.pageContentStyle);
 
-    // 即便是传入的innerDiv，也设置opacity，方便调用者实现opacity的transition效果
+    // always set the opacity for inner div, so they are able to make the transition
     if (!this.state.showPageStatus) {
       acutalPageContentDivStyle.opacity = 0;
     }
 
-    // let actualDiv = this.state.showPageStatus ? withPageDiv : null
     return _react2.default.createElement(
       'div',
       { style: this.props.outterDivStyle || this.pageDivStle },

@@ -86,7 +86,7 @@ describe('ReactScrollPagination', () => {
         <ReactScrollPagination fetchFunc={fetchFunc} excludeElement='.navbar' />
       )
 
-      expect(mockConsole.error).toHaveBeenCalledWith('WARNING: Failed to get the element with given selectdor ".navbar'
+      expect(mockConsole.error).toHaveBeenCalledWith('WARNING: Failed to get the element with given selector ".navbar'
           + '", please veirify. Will take "0" by default.')
     })
   })
@@ -118,7 +118,7 @@ describe('ReactScrollPagination', () => {
         <ReactScrollPagination fetchFunc={fetchFunc} excludeHeight='not20' />
       )
       expect(reactScrollPagination.isolate.excludeHeight).toBe(0)
-      expect(mockConsole.error).toHaveBeenCalledWith('WARN: Failed to convert the props "excludeHeight" with value:' +
+      expect(mockConsole.error).toHaveBeenCalledWith('WARNING: Failed to convert the props "excludeHeight" with value:' +
         ' "not20" to Number, please verify. Will take "0" by default.')
     })
 

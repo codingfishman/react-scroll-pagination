@@ -23,7 +23,7 @@ npm install --save react-scroll-pagination
 ```
 
 ## Basic Usage
-The code below demonstarted the basic use case with the component, we need to specify both `fetchFunc` and `totalPages` at least.
+The code below demonstarted the basic use case with the component, we need to specify the `fetchFunc` at least so it can help to fetch the next page.
 
 ```js
 import ReactScrollPagination from 'react-scroll-pagination'
@@ -35,7 +35,6 @@ render: function () {
     // some list item elements
     <ReactScrollPagination
       fetchFunc={theFuncToFetchNextPage}
-      totalPages={totalPagesOfTheList}
     />
   )
 }
@@ -54,6 +53,7 @@ The function to be excuted while the scroll bar event is triggered, usally the o
  As the function will be called everytime the scroll bar is close to bottom, it will be executed even when previous page has not been rendered yet, we need to handle and prevent the case inside the fetchFunc.
 
 ```js
+// by something like this
 function fetchFunc () {
   if (isRequesting) {
     // do nothing
@@ -66,7 +66,7 @@ function fetchFunc () {
 
 ### totalPages
 `OPTIONAL`
-> If we just want to fetch the next page data without displaying the page number, we can ignore this prop and below
+> If we just want to fetch the next page data without displaying the page number, do not configure it.
 
 We have to tell the component how many pages we totally have when we want to display the pages, so it can calculate the page position.
 
@@ -84,7 +84,7 @@ Specify how long shall the pagination element displays.
 
 Usage:`excludeElement: '#nav-bar'`
 
-> While the component is based on the **HEIGHT** of the document, it's quite sensible for the precision of height. And there are cases that the list is just part of the page, in most situations we have such as *Navbar* on the pate as well, and we need to deduct it from calculation.
+> While the component is based on the **HEIGHT** of the document, it's quite sensible for the precision of height. And there are cases that the list is just part of the page, in most situations we have such as *Navbar* on the page as well, and we need to deduct it from calculation.
 
 This props speicfy the *selector* of the element which should be deduct from height calculation. The *selector* could be anything compatible with jQuery, as we use jQuery here. *Currently, only one element selector is supported.*
 
