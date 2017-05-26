@@ -193,13 +193,28 @@ const ReactScrollPagination = React.createClass({
     jQuery(window).scroll(this.scrollHandler)
   },
 
+  extend: function () {
+    for(var i = 1; i < arguments.length; i++) {
+      for(var key in arguments[i]) {
+        if(arguments[i].hasOwnProperty(key)) { 
+          if (typeof arguments[0][key] === 'object' && typeof arguments[i][key] === 'object') {
+            extend(arguments[0][key], arguments[i][key])
+          } else {
+            arguments[0][key] = arguments[i][key]
+          }
+        }
+      }
+    }
+    return arguments[0]
+  },
+
   render: function () {
     // if no totalPages presented, will only do the fetchings
     if (typeof this.props.totalPages === 'undefined') {
       return (null)
     }
 
-    let acutalPageContentDivStyle = jQuery.extend({}, this.props.innerDivStyle || this.pageContentStyle)
+    let acutalPageContentDivStyle = this.extend({}, this.props.innerDivStyle || this.pageContentStyle)
 
     // always set the opacity for inner div, so they are able to make the transition
     if (!this.state.showPageStatus) {

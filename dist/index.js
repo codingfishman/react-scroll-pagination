@@ -4,21 +4,23 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; /**
+                                                                                                                                                                                                                                                                              * 在页面滚动的时候，监听滚动事件，在快要到达底部指定距离的时候，执行相应函数
+                                                                                                                                                                                                                                                                              * 如果传入 totalPages, 则会在鼠标滚动时
+                                                                                                                                                                                                                                                                              *
+                                                                                                                                                                                                                                                                              * <ReactScrollPagination
+                                                                                                                                                                                                                                                                                  fetchFunc = {targetFuc}
+                                                                                                                                                                                                                                                                                  totalPages = {totalPages}
+                                                                                                                                                                                                                                                                                />
+                                                                                                                                                                                                                                                                              */
+
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var jQuery = require('jquery'); /**
-                                * 在页面滚动的时候，监听滚动事件，在快要到达底部指定距离的时候，执行相应函数
-                                * 如果传入 totalPages, 则会在鼠标滚动时
-                                *
-                                * <ReactScrollPagination
-                                    fetchFunc = {targetFuc}
-                                    totalPages = {totalPages}
-                                  />
-                                */
+var jQuery = require('jquery');
 
 var ReactScrollPagination = _react2.default.createClass({
   displayName: 'ReactScrollPagination',
@@ -195,13 +197,38 @@ var ReactScrollPagination = _react2.default.createClass({
     jQuery(window).scroll(this.scrollHandler);
   },
 
+  extend: function (_extend) {
+    function extend() {
+      return _extend.apply(this, arguments);
+    }
+
+    extend.toString = function () {
+      return _extend.toString();
+    };
+
+    return extend;
+  }(function () {
+    for (var i = 1; i < arguments.length; i++) {
+      for (var key in arguments[i]) {
+        if (arguments[i].hasOwnProperty(key)) {
+          if (_typeof(arguments[0][key]) === 'object' && _typeof(arguments[i][key]) === 'object') {
+            extend(arguments[0][key], arguments[i][key]);
+          } else {
+            arguments[0][key] = arguments[i][key];
+          }
+        }
+      }
+    }
+    return arguments[0];
+  }),
+
   render: function render() {
     // if no totalPages presented, will only do the fetchings
     if (typeof this.props.totalPages === 'undefined') {
       return null;
     }
 
-    var acutalPageContentDivStyle = jQuery.extend({}, this.props.innerDivStyle || this.pageContentStyle);
+    var acutalPageContentDivStyle = this.extend({}, this.props.innerDivStyle || this.pageContentStyle);
 
     // always set the opacity for inner div, so they are able to make the transition
     if (!this.state.showPageStatus) {
