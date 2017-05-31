@@ -25,9 +25,12 @@ var jQuery = require('jquery');
 var ReactScrollPagination = _react2.default.createClass({
   displayName: 'ReactScrollPagination',
 
+
   propTypes: {
     fetchFunc: _react.PropTypes.func.isRequired,
     totalPages: _react.PropTypes.number,
+    windowElement: _react.PropTypes.string, // The element selector which contains the list container and is responsible for scrolling
+    documentElement: _react.PropTypes.string, // The element selector which contains the list
     paginationShowTime: _react.PropTypes.oneOfType([_react.PropTypes.number, // How long shall the pagination div shows
     _react.PropTypes.string]),
     excludeElement: _react.PropTypes.string, // The element selector which should be excluded from calculation
@@ -38,6 +41,7 @@ var ReactScrollPagination = _react2.default.createClass({
     triggerAt: _react.PropTypes.oneOfType([_react.PropTypes.number, // The distance to trigger the fetchfunc
     _react.PropTypes.string])
   },
+
   isolate: {
     onePageHeight: null,
     timeoutFuncHandler: null,
@@ -48,6 +52,7 @@ var ReactScrollPagination = _react2.default.createClass({
     defaultTrigger: 30,
     defaultExcludeHeight: 0
   },
+
   pageDivStle: {
     position: 'fixed',
     bottom: '15px',
@@ -55,6 +60,7 @@ var ReactScrollPagination = _react2.default.createClass({
     right: 0,
     textAlign: 'center'
   },
+
   pageContentStyle: {
     display: 'inline-block',
     background: 'rgba(6, 6, 6, 0.54)',
@@ -70,7 +76,11 @@ var ReactScrollPagination = _react2.default.createClass({
     OTransition: 'opacity 0.8s',
     transition: 'opacity 0.8s'
   },
+
   getInitialState: function getInitialState() {
+    this.windowElement = this.props.windowElement || window;
+    this.documentElement = this.props.documentElement || document;
+
     return {
       currentPage: 1,
       totalPages: null,
@@ -90,6 +100,7 @@ var ReactScrollPagination = _react2.default.createClass({
       _this.setState({ showPageStatus: false });
     }, this.isolate.showTime);
   },
+
   getShowTime: function getShowTime() {
     var showTime = this.isolate.defaultShowTime;
     if (this.props.paginationShowTime) {
@@ -144,7 +155,7 @@ var ReactScrollPagination = _react2.default.createClass({
   },
 
   getOnePageHeight: function getOnePageHeight() {
-    var documentHeight = jQuery(document).height();
+    var documentHeight = jQuery(this.documentElement).height();
 
     /*
     * 当totalPages第一次有值时，表明List是初次加载，此时计算页面的高度，并将其作为单页的高度
@@ -157,8 +168,8 @@ var ReactScrollPagination = _react2.default.createClass({
   handlePagePosition: function handlePagePosition() {
     this.getOnePageHeight();
 
-    var windowHeight = jQuery(window).height();
-    var scrollTop = jQuery(window).scrollTop() + windowHeight - this.isolate.excludeHeight;
+    var windowHeight = jQuery(this.windowElement).height();
+    var scrollTop = jQuery(this.windowElement).scrollTop() + windowHeight - this.isolate.excludeHeight;
 
     if (this.isolate.onePageHeight !== null) {
       var currentPage = Math.ceil(scrollTop / this.isolate.onePageHeight) || 1;
@@ -168,10 +179,10 @@ var ReactScrollPagination = _react2.default.createClass({
   },
 
   scrollHandler: function scrollHandler() {
-    var documentHeight = jQuery(document).height();
+    var documentHeight = jQuery(this.documentElement).height();
 
-    var windowHeight = jQuery(window).height();
-    var scrollBottom = jQuery(window).scrollTop() + windowHeight;
+    var windowHeight = jQuery(this.windowElement).height();
+    var scrollBottom = jQuery(this.windowElement).scrollTop() + windowHeight;
     var triggerBottom = scrollBottom + this.isolate.triggerAt;
 
     // 当滚动条距离底部距离小于30像素的时候出发请求操作
@@ -189,12 +200,12 @@ var ReactScrollPagination = _react2.default.createClass({
   },
 
   componentWillUnmount: function componentWillUnmount() {
-    jQuery(window).unbind('scroll', this.scrollHandler);
+    jQuery(this.windowElement).unbind('scroll', this.scrollHandler);
   },
 
   componentDidMount: function componentDidMount() {
     this.validateAndSetPropValues();
-    jQuery(window).scroll(this.scrollHandler);
+    jQuery(this.windowElement).scroll(this.scrollHandler);
   },
 
   extend: function (_extend) {

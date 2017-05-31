@@ -12,9 +12,12 @@ import React, { PropTypes } from 'react'
 const jQuery = require('jquery')
 
 const ReactScrollPagination = React.createClass({
+
   propTypes: {
     fetchFunc: PropTypes.func.isRequired,
     totalPages: PropTypes.number,
+    windowElement: PropTypes.string, // The element selector which contains the list container and is responsible for scrolling
+    documentElement: PropTypes.string, // The element selector which contains the list
     paginationShowTime: PropTypes.oneOfType([
       PropTypes.number, // How long shall the pagination div shows
       PropTypes.string
@@ -31,6 +34,7 @@ const ReactScrollPagination = React.createClass({
       PropTypes.string
     ]),
   },
+
   isolate: {
     onePageHeight: null,
     timeoutFuncHandler: null,
@@ -41,6 +45,7 @@ const ReactScrollPagination = React.createClass({
     defaultTrigger: 30,
     defaultExcludeHeight: 0
   },
+
   pageDivStle: {
     position: 'fixed',
     bottom: '15px',
@@ -48,6 +53,7 @@ const ReactScrollPagination = React.createClass({
     right: 0,
     textAlign: 'center'
   },
+
   pageContentStyle: {
     display: 'inline-block',
     background: 'rgba(6, 6, 6, 0.54)',
@@ -63,7 +69,11 @@ const ReactScrollPagination = React.createClass({
     OTransition: 'opacity 0.8s',
     transition: 'opacity 0.8s'
   },
+
   getInitialState: function () {
+    this.windowElement = this.props.windowElement || window
+    this.documentElement = this.props.documentElement || document
+
     return {
       currentPage: 1,
       totalPages: null,
@@ -81,6 +91,7 @@ const ReactScrollPagination = React.createClass({
       this.setState({showPageStatus: false})
     }, this.isolate.showTime)
   },
+
   getShowTime: function () {
     let showTime = this.isolate.defaultShowTime
     if (this.props.paginationShowTime) {
@@ -126,7 +137,7 @@ const ReactScrollPagination = React.createClass({
     let triggerAt = this.isolate.defaultTrigger
 
     if (this.props.triggerAt) {
-      triggerAt= parseInt(this.props.triggerAt)
+      triggerAt = parseInt(this.props.triggerAt)
 
       if (isNaN(triggerAt)) {
         triggerAt = this.isolate.defaultTrigger
@@ -140,7 +151,7 @@ const ReactScrollPagination = React.createClass({
   },
 
   getOnePageHeight: function () {
-    const documentHeight = jQuery(document).height()
+    const documentHeight = jQuery(this.documentElement).height()
 
     /*
     * 当totalPages第一次有值时，表明List是初次加载，此时计算页面的高度，并将其作为单页的高度
@@ -153,8 +164,8 @@ const ReactScrollPagination = React.createClass({
   handlePagePosition: function () {
     this.getOnePageHeight()
 
-    let windowHeight = jQuery(window).height()
-    let scrollTop = jQuery(window).scrollTop() + windowHeight - this.isolate.excludeHeight
+    let windowHeight = jQuery(this.windowElement).height()
+    let scrollTop = jQuery(this.windowElement).scrollTop() + windowHeight - this.isolate.excludeHeight
 
     if (this.isolate.onePageHeight !== null) {
       let currentPage = Math.ceil(scrollTop / this.isolate.onePageHeight) || 1
@@ -164,10 +175,10 @@ const ReactScrollPagination = React.createClass({
   },
 
   scrollHandler: function () {
-    let documentHeight = jQuery(document).height()
+    let documentHeight = jQuery(this.documentElement).height()
 
-    let windowHeight = jQuery(window).height()
-    let scrollBottom = jQuery(window).scrollTop() + windowHeight
+    let windowHeight = jQuery(this.windowElement).height()
+    let scrollBottom = jQuery(this.windowElement).scrollTop() + windowHeight
     let triggerBottom = scrollBottom + this.isolate.triggerAt
 
     // 当滚动条距离底部距离小于30像素的时候出发请求操作
@@ -185,12 +196,12 @@ const ReactScrollPagination = React.createClass({
   },
 
   componentWillUnmount: function () {
-    jQuery(window).unbind('scroll', this.scrollHandler)
+    jQuery(this.windowElement).unbind('scroll', this.scrollHandler)
   },
 
   componentDidMount: function () {
     this.validateAndSetPropValues()
-    jQuery(window).scroll(this.scrollHandler)
+    jQuery(this.windowElement).scroll(this.scrollHandler)
   },
 
   extend: function () {
