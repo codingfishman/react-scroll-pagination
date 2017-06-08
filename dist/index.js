@@ -33,6 +33,8 @@ var ReactScrollPagination = _react2.default.createClass({
     documentElement: _react.PropTypes.string, // The element selector which contains the list
     paginationShowTime: _react.PropTypes.oneOfType([_react.PropTypes.number, // How long shall the pagination div shows
     _react.PropTypes.string]),
+    excludeTopMargin: _react.PropTypes.oneOfType([_react.PropTypes.number, // The height value which should be excluded from scrollTop calculation
+    _react.PropTypes.string]),
     excludeElement: _react.PropTypes.string, // The element selector which should be excluded from calculation
     excludeHeight: _react.PropTypes.oneOfType([_react.PropTypes.number, // the height value which should be excluded from calculation
     _react.PropTypes.string]),
@@ -45,11 +47,13 @@ var ReactScrollPagination = _react2.default.createClass({
   isolate: {
     onePageHeight: null,
     timeoutFuncHandler: null,
+    excludeTopMargin: null,
     excludeHeight: null,
     triggerAt: null,
     showTime: null,
     defaultShowTime: 2000,
     defaultTrigger: 30,
+    defaultExcludeTopMargin: 0,
     defaultExcludeHeight: 0
   },
 
@@ -113,6 +117,24 @@ var ReactScrollPagination = _react2.default.createClass({
     return showTime;
   },
 
+  getExcludeTopMargin: function getExcludeTopMargin() {
+    // 获取需要减去的高度
+    var excludeTopMargin = this.isolate.defaultExcludeTopMargin;
+
+    if (this.props.excludeTopMargin) {
+      var propsExcludeTopMargin = parseInt(this.props.excludeTopMargin);
+      if (isNaN(propsExcludeTopMargin)) {
+        console.error('WARNING: Failed to convert the props "excludeTopMargin" with value: "' + this.props.excludeTopMargin + '" to Number, please verify. Will take "' + this.isolate.defaultExcludeTopMargin + '" by default.');
+      } else {
+        excludeTopMargin = propsExcludeTopMargin;
+      }
+    }
+
+    this.isolate.excludeTopMargin = excludeTopMargin;
+
+    return excludeTopMargin;
+  },
+
   getExcludeHeight: function getExcludeHeight() {
     // 获取需要减去的高度
     var excludeHeight = this.isolate.defaultExcludeHeight;
@@ -169,7 +191,7 @@ var ReactScrollPagination = _react2.default.createClass({
     this.getOnePageHeight();
 
     var windowHeight = jQuery(this.windowElement).height();
-    var scrollTop = jQuery(this.windowElement).scrollTop() + windowHeight - this.isolate.excludeHeight;
+    var scrollTop = jQuery(this.windowElement).scrollTop() + windowHeight - this.isolate.excludeHeight - this.isolate.excludeTopMargin;
 
     if (this.isolate.onePageHeight !== null) {
       var currentPage = Math.ceil(scrollTop / this.isolate.onePageHeight) || 1;
@@ -195,6 +217,7 @@ var ReactScrollPagination = _react2.default.createClass({
 
   validateAndSetPropValues: function validateAndSetPropValues() {
     this.isolate.triggerAt = this.getTriggerAt();
+    this.isolate.excludeTopMargin = this.getExcludeTopMargin();
     this.isolate.excludeHeight = this.getExcludeHeight();
     this.isolate.showTime = this.getShowTime();
   },

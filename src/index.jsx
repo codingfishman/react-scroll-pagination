@@ -22,6 +22,10 @@ const ReactScrollPagination = React.createClass({
       PropTypes.number, // How long shall the pagination div shows
       PropTypes.string
     ]),
+    excludeTopMargin: PropTypes.oneOfType([
+      PropTypes.number, // The height value which should be excluded from scrollTop calculation
+      PropTypes.string
+    ]),
     excludeElement: PropTypes.string, // The element selector which should be excluded from calculation
     excludeHeight: PropTypes.oneOfType([
       PropTypes.number, // the height value which should be excluded from calculation
@@ -38,11 +42,13 @@ const ReactScrollPagination = React.createClass({
   isolate: {
     onePageHeight: null,
     timeoutFuncHandler: null,
+    excludeTopMargin: null,
     excludeHeight: null,
     triggerAt: null,
     showTime: null,
     defaultShowTime: 2000,
     defaultTrigger: 30,
+    defaultExcludeTopMargin: 0,
     defaultExcludeHeight: 0
   },
 
@@ -105,6 +111,26 @@ const ReactScrollPagination = React.createClass({
     return showTime
   },
 
+  getExcludeTopMargin: function () {
+    // 获取需要减去的高度
+    let excludeTopMargin = this.isolate.defaultExcludeTopMargin
+
+    if (this.props.excludeTopMargin) {
+      let propsExcludeTopMargin = parseInt(this.props.excludeTopMargin)
+      if (isNaN(propsExcludeTopMargin)) {
+        console.error('WARNING: Failed to convert the props "excludeTopMargin" with value: "' + this.props.excludeTopMargin +
+          '" to Number, please verify. Will take "' + this.isolate.defaultExcludeTopMargin + '" by default.')
+      } else {
+        excludeTopMargin = propsExcludeTopMargin
+      }
+
+    }
+
+    this.isolate.excludeTopMargin = excludeTopMargin
+
+    return excludeTopMargin
+  },
+
   getExcludeHeight: function () {
     // 获取需要减去的高度
     let excludeHeight = this.isolate.defaultExcludeHeight
@@ -165,7 +191,7 @@ const ReactScrollPagination = React.createClass({
     this.getOnePageHeight()
 
     let windowHeight = jQuery(this.windowElement).height()
-    let scrollTop = jQuery(this.windowElement).scrollTop() + windowHeight - this.isolate.excludeHeight
+    let scrollTop = jQuery(this.windowElement).scrollTop() + windowHeight - this.isolate.excludeHeight - this.isolate.excludeTopMargin
 
     if (this.isolate.onePageHeight !== null) {
       let currentPage = Math.ceil(scrollTop / this.isolate.onePageHeight) || 1
@@ -191,6 +217,7 @@ const ReactScrollPagination = React.createClass({
 
   validateAndSetPropValues: function () {
     this.isolate.triggerAt = this.getTriggerAt()
+    this.isolate.excludeTopMargin = this.getExcludeTopMargin()
     this.isolate.excludeHeight = this.getExcludeHeight()
     this.isolate.showTime = this.getShowTime()
   },
