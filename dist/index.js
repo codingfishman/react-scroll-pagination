@@ -4,29 +4,36 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; /**
+                                                                                                                                                                                                                                                                              * 在页面滚动的时候，监听滚动事件，在快要到达底部指定距离的时候，执行相应函数
+                                                                                                                                                                                                                                                                              * 如果传入 totalPages, 则会在鼠标滚动时
+                                                                                                                                                                                                                                                                              *
+                                                                                                                                                                                                                                                                              * <ReactScrollPagination
+                                                                                                                                                                                                                                                                                  fetchFunc = {targetFuc}
+                                                                                                                                                                                                                                                                                  totalPages = {totalPages}
+                                                                                                                                                                                                                                                                                />
+                                                                                                                                                                                                                                                                              */
+
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var jQuery = require('jquery'); /**
-                                * 在页面滚动的时候，监听滚动事件，在快要到达底部指定距离的时候，执行相应函数
-                                * 如果传入 totalPages, 则会在鼠标滚动时
-                                *
-                                * <ReactScrollPagination
-                                    fetchFunc = {targetFuc}
-                                    totalPages = {totalPages}
-                                  />
-                                */
+var jQuery = require('jquery');
 
 var ReactScrollPagination = _react2.default.createClass({
   displayName: 'ReactScrollPagination',
 
+
   propTypes: {
     fetchFunc: _react.PropTypes.func.isRequired,
     totalPages: _react.PropTypes.number,
+    windowElement: _react.PropTypes.string, // The element selector which contains the list container and is responsible for scrolling
+    documentElement: _react.PropTypes.string, // The element selector which contains the list
     paginationShowTime: _react.PropTypes.oneOfType([_react.PropTypes.number, // How long shall the pagination div shows
+    _react.PropTypes.string]),
+    excludeTopMargin: _react.PropTypes.oneOfType([_react.PropTypes.number, // The height value which should be excluded from scrollTop calculation
     _react.PropTypes.string]),
     excludeElement: _react.PropTypes.string, // The element selector which should be excluded from calculation
     excludeHeight: _react.PropTypes.oneOfType([_react.PropTypes.number, // the height value which should be excluded from calculation
@@ -36,16 +43,20 @@ var ReactScrollPagination = _react2.default.createClass({
     triggerAt: _react.PropTypes.oneOfType([_react.PropTypes.number, // The distance to trigger the fetchfunc
     _react.PropTypes.string])
   },
+
   isolate: {
     onePageHeight: null,
     timeoutFuncHandler: null,
+    excludeTopMargin: null,
     excludeHeight: null,
     triggerAt: null,
     showTime: null,
     defaultShowTime: 2000,
     defaultTrigger: 30,
+    defaultExcludeTopMargin: 0,
     defaultExcludeHeight: 0
   },
+
   pageDivStle: {
     position: 'fixed',
     bottom: '15px',
@@ -53,6 +64,7 @@ var ReactScrollPagination = _react2.default.createClass({
     right: 0,
     textAlign: 'center'
   },
+
   pageContentStyle: {
     display: 'inline-block',
     background: 'rgba(6, 6, 6, 0.54)',
@@ -68,7 +80,11 @@ var ReactScrollPagination = _react2.default.createClass({
     OTransition: 'opacity 0.8s',
     transition: 'opacity 0.8s'
   },
+
   getInitialState: function getInitialState() {
+    this.windowElement = this.props.windowElement || window;
+    this.documentElement = this.props.documentElement || document;
+
     return {
       currentPage: 1,
       totalPages: null,
@@ -88,6 +104,7 @@ var ReactScrollPagination = _react2.default.createClass({
       _this.setState({ showPageStatus: false });
     }, this.isolate.showTime);
   },
+
   getShowTime: function getShowTime() {
     var showTime = this.isolate.defaultShowTime;
     if (this.props.paginationShowTime) {
@@ -98,6 +115,24 @@ var ReactScrollPagination = _react2.default.createClass({
       }
     }
     return showTime;
+  },
+
+  getExcludeTopMargin: function getExcludeTopMargin() {
+    // 获取需要减去的高度
+    var excludeTopMargin = this.isolate.defaultExcludeTopMargin;
+
+    if (this.props.excludeTopMargin) {
+      var propsExcludeTopMargin = parseInt(this.props.excludeTopMargin);
+      if (isNaN(propsExcludeTopMargin)) {
+        console.error('WARNING: Failed to convert the props "excludeTopMargin" with value: "' + this.props.excludeTopMargin + '" to Number, please verify. Will take "' + this.isolate.defaultExcludeTopMargin + '" by default.');
+      } else {
+        excludeTopMargin = propsExcludeTopMargin;
+      }
+    }
+
+    this.isolate.excludeTopMargin = excludeTopMargin;
+
+    return excludeTopMargin;
   },
 
   getExcludeHeight: function getExcludeHeight() {
@@ -142,7 +177,7 @@ var ReactScrollPagination = _react2.default.createClass({
   },
 
   getOnePageHeight: function getOnePageHeight() {
-    var documentHeight = jQuery(document).height();
+    var documentHeight = jQuery(this.documentElement).height();
 
     /*
     * 当totalPages第一次有值时，表明List是初次加载，此时计算页面的高度，并将其作为单页的高度
@@ -155,8 +190,8 @@ var ReactScrollPagination = _react2.default.createClass({
   handlePagePosition: function handlePagePosition() {
     this.getOnePageHeight();
 
-    var windowHeight = jQuery(window).height();
-    var scrollTop = jQuery(window).scrollTop() + windowHeight - this.isolate.excludeHeight;
+    var windowHeight = jQuery(this.windowElement).height();
+    var scrollTop = jQuery(this.windowElement).scrollTop() + windowHeight - this.isolate.excludeHeight - this.isolate.excludeTopMargin;
 
     if (this.isolate.onePageHeight !== null) {
       var currentPage = Math.ceil(scrollTop / this.isolate.onePageHeight) || 1;
@@ -166,10 +201,10 @@ var ReactScrollPagination = _react2.default.createClass({
   },
 
   scrollHandler: function scrollHandler() {
-    var documentHeight = jQuery(document).height();
+    var documentHeight = jQuery(this.documentElement).height();
 
-    var windowHeight = jQuery(window).height();
-    var scrollBottom = jQuery(window).scrollTop() + windowHeight;
+    var windowHeight = jQuery(this.windowElement).height();
+    var scrollBottom = jQuery(this.windowElement).scrollTop() + windowHeight;
     var triggerBottom = scrollBottom + this.isolate.triggerAt;
 
     // 当滚动条距离底部距离小于30像素的时候出发请求操作
@@ -182,18 +217,44 @@ var ReactScrollPagination = _react2.default.createClass({
 
   validateAndSetPropValues: function validateAndSetPropValues() {
     this.isolate.triggerAt = this.getTriggerAt();
+    this.isolate.excludeTopMargin = this.getExcludeTopMargin();
     this.isolate.excludeHeight = this.getExcludeHeight();
     this.isolate.showTime = this.getShowTime();
   },
 
   componentWillUnmount: function componentWillUnmount() {
-    jQuery(window).unbind('scroll', this.scrollHandler);
+    jQuery(this.windowElement).unbind('scroll', this.scrollHandler);
   },
 
   componentDidMount: function componentDidMount() {
     this.validateAndSetPropValues();
-    jQuery(window).scroll(this.scrollHandler);
+    jQuery(this.windowElement).scroll(this.scrollHandler);
   },
+
+  extend: function (_extend) {
+    function extend() {
+      return _extend.apply(this, arguments);
+    }
+
+    extend.toString = function () {
+      return _extend.toString();
+    };
+
+    return extend;
+  }(function () {
+    for (var i = 1; i < arguments.length; i++) {
+      for (var key in arguments[i]) {
+        if (arguments[i].hasOwnProperty(key)) {
+          if (_typeof(arguments[0][key]) === 'object' && _typeof(arguments[i][key]) === 'object') {
+            extend(arguments[0][key], arguments[i][key]);
+          } else {
+            arguments[0][key] = arguments[i][key];
+          }
+        }
+      }
+    }
+    return arguments[0];
+  }),
 
   render: function render() {
     // if no totalPages presented, will only do the fetchings
@@ -201,7 +262,7 @@ var ReactScrollPagination = _react2.default.createClass({
       return null;
     }
 
-    var acutalPageContentDivStyle = jQuery.extend({}, this.props.innerDivStyle || this.pageContentStyle);
+    var acutalPageContentDivStyle = this.extend({}, this.props.innerDivStyle || this.pageContentStyle);
 
     // always set the opacity for inner div, so they are able to make the transition
     if (!this.state.showPageStatus) {

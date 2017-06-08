@@ -12,11 +12,18 @@ import React, { PropTypes } from 'react'
 const jQuery = require('jquery')
 
 const ReactScrollPagination = React.createClass({
+
   propTypes: {
     fetchFunc: PropTypes.func.isRequired,
     totalPages: PropTypes.number,
+    windowElement: PropTypes.string, // The element selector which contains the list container and is responsible for scrolling
+    documentElement: PropTypes.string, // The element selector which contains the list
     paginationShowTime: PropTypes.oneOfType([
       PropTypes.number, // How long shall the pagination div shows
+      PropTypes.string
+    ]),
+    excludeTopMargin: PropTypes.oneOfType([
+      PropTypes.number, // The height value which should be excluded from scrollTop calculation
       PropTypes.string
     ]),
     excludeElement: PropTypes.string, // The element selector which should be excluded from calculation
@@ -31,16 +38,20 @@ const ReactScrollPagination = React.createClass({
       PropTypes.string
     ]),
   },
+
   isolate: {
     onePageHeight: null,
     timeoutFuncHandler: null,
+    excludeTopMargin: null,
     excludeHeight: null,
     triggerAt: null,
     showTime: null,
     defaultShowTime: 2000,
     defaultTrigger: 30,
+    defaultExcludeTopMargin: 0,
     defaultExcludeHeight: 0
   },
+
   pageDivStle: {
     position: 'fixed',
     bottom: '15px',
@@ -48,6 +59,7 @@ const ReactScrollPagination = React.createClass({
     right: 0,
     textAlign: 'center'
   },
+
   pageContentStyle: {
     display: 'inline-block',
     background: 'rgba(6, 6, 6, 0.54)',
@@ -63,7 +75,11 @@ const ReactScrollPagination = React.createClass({
     OTransition: 'opacity 0.8s',
     transition: 'opacity 0.8s'
   },
+
   getInitialState: function () {
+    this.windowElement = this.props.windowElement || window
+    this.documentElement = this.props.documentElement || document
+
     return {
       currentPage: 1,
       totalPages: null,
@@ -81,6 +97,7 @@ const ReactScrollPagination = React.createClass({
       this.setState({showPageStatus: false})
     }, this.isolate.showTime)
   },
+
   getShowTime: function () {
     let showTime = this.isolate.defaultShowTime
     if (this.props.paginationShowTime) {
@@ -92,6 +109,26 @@ const ReactScrollPagination = React.createClass({
       }
     }
     return showTime
+  },
+
+  getExcludeTopMargin: function () {
+    // 获取需要减去的高度
+    let excludeTopMargin = this.isolate.defaultExcludeTopMargin
+
+    if (this.props.excludeTopMargin) {
+      let propsExcludeTopMargin = parseInt(this.props.excludeTopMargin)
+      if (isNaN(propsExcludeTopMargin)) {
+        console.error('WARNING: Failed to convert the props "excludeTopMargin" with value: "' + this.props.excludeTopMargin +
+          '" to Number, please verify. Will take "' + this.isolate.defaultExcludeTopMargin + '" by default.')
+      } else {
+        excludeTopMargin = propsExcludeTopMargin
+      }
+
+    }
+
+    this.isolate.excludeTopMargin = excludeTopMargin
+
+    return excludeTopMargin
   },
 
   getExcludeHeight: function () {
@@ -126,7 +163,7 @@ const ReactScrollPagination = React.createClass({
     let triggerAt = this.isolate.defaultTrigger
 
     if (this.props.triggerAt) {
-      triggerAt= parseInt(this.props.triggerAt)
+      triggerAt = parseInt(this.props.triggerAt)
 
       if (isNaN(triggerAt)) {
         triggerAt = this.isolate.defaultTrigger
@@ -140,7 +177,7 @@ const ReactScrollPagination = React.createClass({
   },
 
   getOnePageHeight: function () {
-    const documentHeight = jQuery(document).height()
+    const documentHeight = jQuery(this.documentElement).height()
 
     /*
     * 当totalPages第一次有值时，表明List是初次加载，此时计算页面的高度，并将其作为单页的高度
@@ -153,8 +190,8 @@ const ReactScrollPagination = React.createClass({
   handlePagePosition: function () {
     this.getOnePageHeight()
 
-    let windowHeight = jQuery(window).height()
-    let scrollTop = jQuery(window).scrollTop() + windowHeight - this.isolate.excludeHeight
+    let windowHeight = jQuery(this.windowElement).height()
+    let scrollTop = jQuery(this.windowElement).scrollTop() + windowHeight - this.isolate.excludeHeight - this.isolate.excludeTopMargin
 
     if (this.isolate.onePageHeight !== null) {
       let currentPage = Math.ceil(scrollTop / this.isolate.onePageHeight) || 1
@@ -164,10 +201,10 @@ const ReactScrollPagination = React.createClass({
   },
 
   scrollHandler: function () {
-    let documentHeight = jQuery(document).height()
+    let documentHeight = jQuery(this.documentElement).height()
 
-    let windowHeight = jQuery(window).height()
-    let scrollBottom = jQuery(window).scrollTop() + windowHeight
+    let windowHeight = jQuery(this.windowElement).height()
+    let scrollBottom = jQuery(this.windowElement).scrollTop() + windowHeight
     let triggerBottom = scrollBottom + this.isolate.triggerAt
 
     // 当滚动条距离底部距离小于30像素的时候出发请求操作
@@ -180,17 +217,33 @@ const ReactScrollPagination = React.createClass({
 
   validateAndSetPropValues: function () {
     this.isolate.triggerAt = this.getTriggerAt()
+    this.isolate.excludeTopMargin = this.getExcludeTopMargin()
     this.isolate.excludeHeight = this.getExcludeHeight()
     this.isolate.showTime = this.getShowTime()
   },
 
   componentWillUnmount: function () {
-    jQuery(window).unbind('scroll', this.scrollHandler)
+    jQuery(this.windowElement).unbind('scroll', this.scrollHandler)
   },
 
   componentDidMount: function () {
     this.validateAndSetPropValues()
-    jQuery(window).scroll(this.scrollHandler)
+    jQuery(this.windowElement).scroll(this.scrollHandler)
+  },
+
+  extend: function () {
+    for(var i = 1; i < arguments.length; i++) {
+      for(var key in arguments[i]) {
+        if(arguments[i].hasOwnProperty(key)) { 
+          if (typeof arguments[0][key] === 'object' && typeof arguments[i][key] === 'object') {
+            extend(arguments[0][key], arguments[i][key])
+          } else {
+            arguments[0][key] = arguments[i][key]
+          }
+        }
+      }
+    }
+    return arguments[0]
   },
 
   render: function () {
@@ -199,7 +252,7 @@ const ReactScrollPagination = React.createClass({
       return (null)
     }
 
-    let acutalPageContentDivStyle = jQuery.extend({}, this.props.innerDivStyle || this.pageContentStyle)
+    let acutalPageContentDivStyle = this.extend({}, this.props.innerDivStyle || this.pageContentStyle)
 
     // always set the opacity for inner div, so they are able to make the transition
     if (!this.state.showPageStatus) {
