@@ -8,10 +8,12 @@
   />
 */
 
-import React, { PropTypes } from 'react'
+import React, { Component } from 'react'
+import createReactClass from 'create-react-class'
+import PropTypes from 'prop-types'
 const jQuery = require('jquery')
 
-const ReactScrollPagination = React.createClass({
+const ReactScrollPagination = createReactClass({
   propTypes: {
     fetchFunc: PropTypes.func.isRequired,
     totalPages: PropTypes.number,

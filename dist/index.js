@@ -8,6 +8,14 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
+var _createReactClass = require('create-react-class');
+
+var _createReactClass2 = _interopRequireDefault(_createReactClass);
+
+var _propTypes = require('prop-types');
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var jQuery = require('jquery'); /**
@@ -20,21 +28,21 @@ var jQuery = require('jquery'); /**
                                   />
                                 */
 
-var ReactScrollPagination = _react2.default.createClass({
+var ReactScrollPagination = (0, _createReactClass2.default)({
   displayName: 'ReactScrollPagination',
 
   propTypes: {
-    fetchFunc: _react.PropTypes.func.isRequired,
-    totalPages: _react.PropTypes.number,
-    paginationShowTime: _react.PropTypes.oneOfType([_react.PropTypes.number, // How long shall the pagination div shows
-    _react.PropTypes.string]),
-    excludeElement: _react.PropTypes.string, // The element selector which should be excluded from calculation
-    excludeHeight: _react.PropTypes.oneOfType([_react.PropTypes.number, // the height value which should be excluded from calculation
-    _react.PropTypes.string]),
-    outterDivStyle: _react.PropTypes.object, // Style of the outter Div element
-    innerDivStyle: _react.PropTypes.object, // Style of the inner Div element
-    triggerAt: _react.PropTypes.oneOfType([_react.PropTypes.number, // The distance to trigger the fetchfunc
-    _react.PropTypes.string])
+    fetchFunc: _propTypes2.default.func.isRequired,
+    totalPages: _propTypes2.default.number,
+    paginationShowTime: _propTypes2.default.oneOfType([_propTypes2.default.number, // How long shall the pagination div shows
+    _propTypes2.default.string]),
+    excludeElement: _propTypes2.default.string, // The element selector which should be excluded from calculation
+    excludeHeight: _propTypes2.default.oneOfType([_propTypes2.default.number, // the height value which should be excluded from calculation
+    _propTypes2.default.string]),
+    outterDivStyle: _propTypes2.default.object, // Style of the outter Div element
+    innerDivStyle: _propTypes2.default.object, // Style of the inner Div element
+    triggerAt: _propTypes2.default.oneOfType([_propTypes2.default.number, // The distance to trigger the fetchfunc
+    _propTypes2.default.string])
   },
   isolate: {
     onePageHeight: null,
