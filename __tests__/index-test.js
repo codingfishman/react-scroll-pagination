@@ -6,17 +6,19 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import jQuery from 'jquery'
 
-import TestUtils from 'react-addons-test-utils'
+import TestUtils from 'react-dom/test-utils'
 import ReactScrollPagination from '../src/index.jsx'
 
 describe('ReactScrollPagination', () => {
   let fetchFunc = null
-  let mockConsole = null
-
+  let mockConsoleWarn = null
+  let mockConsoleError = null
   beforeEach(() => {
     fetchFunc = jest.fn()
-    mockConsole = jasmine.createSpyObj('console', ['error', 'warn'])
-    window.console = mockConsole
+    mockConsoleError = jasmine.createSpy('error')
+    mockConsoleWarn = jasmine.createSpy('warn')
+    window.console.error = mockConsoleError
+    window.console.warn = mockConsoleWarn
   })
 
   afterEach(() => {
@@ -24,11 +26,12 @@ describe('ReactScrollPagination', () => {
   })
 
   it('Should console the error when required props "fetchFunc" is not presented', () => {
+
     const reactScrollPagination = TestUtils.renderIntoDocument(
       <ReactScrollPagination />
     )
 
-    expect(mockConsole.error.calls.count()).toEqual(1)
+    expect(mockConsoleError.calls.count()).toEqual(1)
   })
 
   it('Should not display the pagination div if only props "fetchFunc" presented', () => {
@@ -37,7 +40,7 @@ describe('ReactScrollPagination', () => {
     )
     const reactScrollPaginationNode = ReactDOM.findDOMNode(reactScrollPagination)
     expect(reactScrollPaginationNode).toEqual(null)
-    expect(mockConsole.error.calls.count()).toEqual(0)
+    expect(mockConsoleWarn.calls.count()).toEqual(0)
   })
 
   describe('Test the props "paginationShowTime" ', () => {
@@ -56,7 +59,7 @@ describe('ReactScrollPagination', () => {
 
       expect(reactScrollPagination.isolate.showTime).toEqual(reactScrollPagination.isolate.defaultShowTime)
 
-      expect(mockConsole.error).toHaveBeenCalledWith('WARNING: Failed to convert props "paginationShowTime" to Number' +
+      expect(mockConsoleError).toHaveBeenCalledWith('WARNING: Failed to convert props "paginationShowTime" to Number' +
         ' with value: "not1500". Will take 2000 by default.')
     })
   })
@@ -86,7 +89,7 @@ describe('ReactScrollPagination', () => {
         <ReactScrollPagination fetchFunc={fetchFunc} excludeElement='.navbar' />
       )
 
-      expect(mockConsole.error).toHaveBeenCalledWith('WARNING: Failed to get the element with given selector ".navbar'
+      expect(mockConsoleError).toHaveBeenCalledWith('WARNING: Failed to get the element with given selector ".navbar'
           + '", please veirify. Will take "0" by default.')
     })
   })
@@ -118,7 +121,7 @@ describe('ReactScrollPagination', () => {
         <ReactScrollPagination fetchFunc={fetchFunc} excludeHeight='not20' />
       )
       expect(reactScrollPagination.isolate.excludeHeight).toBe(0)
-      expect(mockConsole.error).toHaveBeenCalledWith('WARNING: Failed to convert the props "excludeHeight" with value:' +
+      expect(mockConsoleError).toHaveBeenCalledWith('WARNING: Failed to convert the props "excludeHeight" with value:' +
         ' "not20" to Number, please verify. Will take "0" by default.')
     })
 
@@ -159,7 +162,7 @@ describe('ReactScrollPagination', () => {
         <ReactScrollPagination fetchFunc={fetchFunc} triggerAt='not60' />
       )
       expect(reactScrollPagination.isolate.triggerAt).toBe(30)
-      expect(mockConsole.error).toHaveBeenCalledWith('WARNING: Failed to convert the props "triggerAt" to number with' +
+      expect(mockConsoleError).toHaveBeenCalledWith('WARNING: Failed to convert the props "triggerAt" to number with' +
        ' value: "not60". Will take 30px by default.')
     })
   })

@@ -1,6 +1,6 @@
 {
   "name": "react-scroll-pagination",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "A component for pagination with scrolling",
   "main": "dist/index.js",
   "scripts": {
@@ -38,11 +38,12 @@
     "eslint-plugin-flow-vars": "^0.3.0",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
-    "jest-cli": "*",
+    "jasmine": "^2.8.0",
+    "jest": "^21.2.1",
+    "jest-cli": "^21.2.1",
     "jscs": "^3.0.3",
-    "react": "~0.14.0",
-    "react-addons-test-utils": "~0.14.0",
-    "react-dom": "^0.14.0"
+    "react": "~15.6.2",
+    "react-dom": "^15.6.2"
   },
   "jest": {
     "unmockedModulePathPatterns": [
