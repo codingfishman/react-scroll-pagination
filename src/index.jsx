@@ -8,7 +8,7 @@
   />
 */
 
-import React, { Component } from 'react'
+import React, { Component } from 'react/lib/React'
 import createReactClass from 'create-react-class'
 import PropTypes from 'prop-types'
 const jQuery = require('jquery')
@@ -142,7 +142,7 @@ const ReactScrollPagination = createReactClass({
   },
 
   getOnePageHeight: function () {
-    const documentHeight = jQuery(document).height()
+    const documentHeight = this.documentHeight()
 
     /*
     * 当totalPages第一次有值时，表明List是初次加载，此时计算页面的高度，并将其作为单页的高度
@@ -155,25 +155,35 @@ const ReactScrollPagination = createReactClass({
   handlePagePosition: function () {
     this.getOnePageHeight()
 
-    let windowHeight = jQuery(window).height()
-    let scrollTop = jQuery(window).scrollTop() + windowHeight - this.isolate.excludeHeight
+    let scrollBottom = this.scrollTop() + this.windowHeight() - this.isolate.excludeHeight
 
     if (this.isolate.onePageHeight !== null) {
-      let currentPage = Math.ceil(scrollTop / this.isolate.onePageHeight) || 1
+      let currentPage = Math.ceil(scrollBottom / this.isolate.onePageHeight) || 1
       this.setState({currentPage: currentPage})
       this.showPagePositionDiv()
     }
   },
 
-  scrollHandler: function () {
-    let documentHeight = jQuery(document).height()
+  windowHeight: function () {
+    return Math.max(document.body.clientHeight, window.innerWidth)
+  },
 
-    let windowHeight = jQuery(window).height()
-    let scrollBottom = jQuery(window).scrollTop() + windowHeight
+  documentHeight: function () {
+    return Math.max(this.windowHeight(), document.documentElement.clientHeight,
+      document.body.scrollHeight, document.documentElement.scrollHeight,
+      document.body.offsetHeight, document.documentElement.offsetHeight)
+  },
+
+  scrollTop: function() {
+    return window.pageYOffset || document.documentElement.scrollTop
+  },
+
+  scrollHandler: function () {
+    let scrollBottom = this.scrollTop() + this.windowHeight()
     let triggerBottom = scrollBottom + this.isolate.triggerAt
 
     // 当滚动条距离底部距离小于30像素的时候出发请求操作
-    if (triggerBottom >= documentHeight) {
+    if (triggerBottom >= this.documentHeight()) {
       this.props.fetchFunc()
     }
 
