@@ -6,19 +6,18 @@ module.exports = {
     library: 'ReactScrollPagination'
   },
   externals: {
-    react:'React',
-    jquery: 'jQuery'
+    react: 'React'
   },
   module:{
     rules: [
       {
         test: /\.jsx$/,
-        exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
           options: {
             presets: ['es2015', 'stage-0', 'react'],
-            plugins: ['transform-runtime']
+            plugins: ['transform-runtime'],
+            ignore: /node_modules/,
           }
         }
       }
