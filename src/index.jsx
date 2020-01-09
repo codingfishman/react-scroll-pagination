@@ -185,7 +185,7 @@ export default class ReactScrollPagination extends Component {
   }
 
   scrollHandler = () => {
-    let scrollBottom = this.scrollTop() + this.windowHeight()
+    let scrollBottom = this.scrollTop() + window.innerHeight
     let triggerBottom = scrollBottom + this.isolate.triggerAt
 
     // 当滚动条距离底部距离小于30像素的时候出发请求操作
