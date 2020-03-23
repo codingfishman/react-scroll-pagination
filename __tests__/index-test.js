@@ -4,7 +4,6 @@ jest.unmock('../src/index.jsx')
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import jQuery from 'jquery'
 
 import TestUtils from 'react-dom/test-utils'
 import ReactScrollPagination from '../src/index.jsx'
@@ -34,13 +33,13 @@ describe('ReactScrollPagination', () => {
     expect(mockConsoleError.calls.count()).toEqual(1)
   })
 
-  it('Should not display the pagination div if only props "fetchFunc" presented', () => {
+  it('Should not display the pagination div when no "totalPages" provided', () => {
     const reactScrollPagination = TestUtils.renderIntoDocument(
       <ReactScrollPagination fetchFunc={fetchFunc} />
     )
     const reactScrollPaginationNode = ReactDOM.findDOMNode(reactScrollPagination)
     expect(reactScrollPaginationNode).toEqual(null)
-    expect(mockConsoleWarn.calls.count()).toEqual(0)
+    expect(mockConsoleWarn.calls.count()).toEqual(1)
   })
 
   describe('Test the props "paginationShowTime" ', () => {
@@ -66,7 +65,7 @@ describe('ReactScrollPagination', () => {
 
   describe('Test the props "excludeElement" ', () => {
     beforeEach(() => {
-      document.body.innerHTML = '<nav id="navbar" style="height:70px" > navbar1 </nav>'
+       document.body.innerHTML = '<div id="navbar" style="height:70px;" > navbar1 </div>'
     })
 
     it('Should take default value if the props is not presented ', ()=> {

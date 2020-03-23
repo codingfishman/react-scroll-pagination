@@ -77,7 +77,7 @@ export default class ReactScrollPagination extends Component {
     showPageStatus: false
   }
 
-  showPagePositionDiv = () => {
+  showPagePositionDiv() {
     if (this.isolate.timeoutFuncHandler) {
       clearTimeout(this.isolate.timeoutFuncHandler)
     }
@@ -88,7 +88,7 @@ export default class ReactScrollPagination extends Component {
     }, this.isolate.showTime)
   }
 
-  getShowTime = () => {
+  getShowTime() {
     let showTime = this.isolate.defaultShowTime
     if (this.props.paginationShowTime) {
       showTime = parseInt(this.props.paginationShowTime)
@@ -101,7 +101,7 @@ export default class ReactScrollPagination extends Component {
     return showTime
   }
 
-  getExcludeHeight = () => {
+  getExcludeHeight() {
     // 获取需要减去的高度
     let excludeHeight = this.isolate.defaultExcludeHeight
 
@@ -124,12 +124,11 @@ export default class ReactScrollPagination extends Component {
           '", please veirify. Will take "' + this.isolate.defaultExcludeHeight + '" by default.')
       }
     }
-    this.isolate.excludeHeight = excludeHeight
 
     return excludeHeight
   }
 
-  getTriggerAt = () => {
+  getTriggerAt() {
     let triggerAt = this.isolate.defaultTrigger
 
     if (this.props.triggerAt) {
@@ -146,7 +145,7 @@ export default class ReactScrollPagination extends Component {
     return triggerAt
   }
 
-  getOnePageHeight = () => {
+  getOnePageHeight() {
     const documentHeight = this.documentHeight()
 
     /*
@@ -158,7 +157,7 @@ export default class ReactScrollPagination extends Component {
     }
   }
 
-  handlePagePosition = () => {
+  handlePagePosition() {
     this.getOnePageHeight()
 
     let scrollBottom = this.scrollTop() + this.windowHeight() - this.isolate.excludeHeight
@@ -170,21 +169,21 @@ export default class ReactScrollPagination extends Component {
     }
   }
 
-  windowHeight = () => {
+  windowHeight() {
     return Math.max(document.body.clientHeight, window.innerWidth)
   }
 
-  documentHeight = () => {
+  documentHeight() {
     return Math.max(this.windowHeight(), document.documentElement.clientHeight,
       document.body.scrollHeight, document.documentElement.scrollHeight,
       document.body.offsetHeight, document.documentElement.offsetHeight)
   }
 
-  scrollTop = () => {
+  scrollTop() {
     return window.pageYOffset || document.documentElement.scrollTop
   }
 
-  scrollHandler = () => {
+  scrollHandler() {
     let scrollBottom = this.scrollTop() + window.innerHeight
     let triggerBottom = scrollBottom + this.isolate.triggerAt
 
@@ -196,24 +195,36 @@ export default class ReactScrollPagination extends Component {
     this.handlePagePosition()
   }
 
-  validateAndSetPropValues = () => {
+  validateAndSetPropValues() {
     this.isolate.triggerAt = this.getTriggerAt()
     this.isolate.excludeHeight = this.getExcludeHeight()
     this.isolate.showTime = this.getShowTime()
   }
 
-  componentWillUnmount = () => {
+  componentWillUnmount() {
     window.removeEventListener('scroll', this.scrollHandler)
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.validateAndSetPropValues()
     window.addEventListener('scroll', this.scrollHandler)
+
+    if (!this.props.fetchFunc) {
+      console.error("ERROR: the mandatory property 'fetchNext' isn't defined")
+    }
+    if (!this.haveToRender()) {
+      console.warn("ERROR: the optional property 'totalPages' isn't defined, so the component won't be rendered")
+    }
+
   }
 
-  render = () => {
+  haveToRender() {
+    return typeof this.props.totalPages !== 'undefined' && this.props.totalPages !== null
+  }
+
+  render() {
     // if no totalPages presented, will only do the fetchings
-    if (typeof this.props.totalPages === 'undefined') {
+    if (!this.haveToRender()) {
       return (null)
     }
 
