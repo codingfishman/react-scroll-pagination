@@ -77,6 +77,12 @@ export default class ReactScrollPagination extends Component {
     showPageStatus: false
   }
 
+  constructor(props) {
+     super(props)
+
+     this.scrollHandler = this.scrollHandler.bind(this)
+  }
+
   showPagePositionDiv() {
     if (this.isolate.timeoutFuncHandler) {
       clearTimeout(this.isolate.timeoutFuncHandler)
