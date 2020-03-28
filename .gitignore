@@ -28,6 +28,10 @@ node_modules
 
 # Optional npm cache directory
 .npm
+*~
+*.sw*
+yarn.lock
+.cache
 
 # Optional REPL history
 .node_repl_history
