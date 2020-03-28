@@ -44,7 +44,8 @@ module.exports = {
                      [
                         "@babel/plugin-proposal-class-properties",
                         {
-                           "spec": true
+                           "spec": true,
+                           "loose": true
                         }
                      ],
                      '@babel/plugin-transform-react-inline-elements',
